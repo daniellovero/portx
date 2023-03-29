@@ -1,0 +1,63 @@
+version: '3.7'
+networks:
+  portx-app-network:
+    name: portx-app-network
+services:
+  portx-application:
+    build:
+      context: .
+    container_name: portx-springboot
+    image: maven:3.8.4-openjdk-17
+    ports:
+      - "8081:8081"
+    networks:
+      - portx-app-network
+    depends_on:
+      - portx-database
+    environment:
+      - DB_HOST=portx-database
+      - DB_NAME=portx
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - DB_PORT=3306
+      - KAFKA_TOPIC=kafka
+  portx-database:
+    container_name: portx-database
+    image: mariadb:10.11
+    networks:
+      - portx-app-network
+    environment:
+      - MARIADB_ROOT_USER=root
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=portx
+    command: --init-file /data/application/initializeDB.sql
+    volumes:
+      - ./initializeDB.sql:/data/application/initializeDB.sql
+    ports:
+      - "3306:3306"
+    restart: always
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    networks:
+      - portx-app-network
+    environment:
+      KAFKA_TOPIC: kafka
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:22181"
+    networks:
+      - portx-app-network
