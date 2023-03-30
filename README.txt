@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-In order to run this project there are a few considerations to keep in mind
+In order to run this project there are a few pre-requisites completed
 
 #### Dependencies
 
@@ -57,7 +57,7 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-Or use your preferred IDE to run it.
+Or use your prefered IDE to run it. 
 
 #### Again, for starting, you may want to look into `http://localhost:8081/swagger-ui/index.html`
 
@@ -82,8 +82,9 @@ mvn clean test jacoco:report
 
 ## Specification (OpenAPI 3.0)
 
-For the REST API contract specification please refer to `paymentsRestApi-openapi3-spec.json`. 
+For the REST API contract specification please refer to `paymentsRestApi-openapi3-spec.json`.
 Or you can also watch it online served on the swagger graphic interface on http://localhost:8081/swagger-ui/index.html.
+
 
 # SupplierRestClient
 
