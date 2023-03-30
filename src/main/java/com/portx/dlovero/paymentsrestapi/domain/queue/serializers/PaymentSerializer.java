@@ -19,5 +19,4 @@ public class PaymentSerializer implements Serializer<Payment> {
             throw new SerializationException("Error serializing payment", e);
         }
     }
-
 }

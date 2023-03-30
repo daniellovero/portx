@@ -41,7 +41,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatGetByIdReturns200AndThePaymentIfExists() throws Exception {
+    void testThatGetByIdReturnsOkAndThePaymentIfExists() throws Exception {
         Payment validPayment = paymentFactory.createValidPayment();
 
         when(paymentService.getPaymentById(1L)).thenReturn(Optional.of(validPayment));
@@ -53,7 +53,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatGetByIdReturns404AndEmptyIfThePaymentDoesNotExists() throws Exception {
+    void testThatGetByIdReturnsClientErrorAndEmptyIfThePaymentDoesNotExists() throws Exception {
         when(paymentService.getPaymentById(1L)).thenReturn(Optional.empty());
         mockMvc.perform(get("/payments/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatItThrows400IfIdempotentKeyIsInvalidWhileCreatingPayment() throws Exception {
+    void testThatPostReturnsClientErrorIfIdempotentKeyIsInvalidWhileCreatingPayment() throws Exception {
         Payment validPayment = paymentFactory.createValidPayment();
 
         mockMvc.perform(post("/payments")
@@ -74,7 +74,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatThrows500IfAnUnexpectedErrorHappensWhileCreatingPayment() throws Exception {
+    void testThatPostReturnsServerErrorIfAnUnexpectedErrorHappensWhileCreatingPayment() throws Exception {
         Payment validPayment = paymentFactory.createValidPayment();
 
         when(paymentService.saveAndPublishPayment(any(Payment.class), any(UUID.class))).thenThrow(new RuntimeException("DB Error"));
@@ -87,7 +87,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatThrows500IfPaymentAlreadyExistsAndDoesNotReturnAnything() throws Exception {
+    void testThatPostReturnsServerErrorIfPaymentAlreadyExistsAndDoesNotReturnAnything() throws Exception {
         Payment invalidPayment = paymentFactory.createInvalidPayment();
 
         when(paymentService.saveAndPublishPayment(any(Payment.class), any(UUID.class))).thenThrow(new CustomPaymentAlreadyExists("Already exists"));
@@ -100,7 +100,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatThrows400IfDomainValidationFailsAndDoesNotReturnAnything() throws Exception {
+    void testThatPostReturnsClientErrorIfDomainValidationFailsAndDoesNotReturnAnything() throws Exception {
         Payment invalidPayment = paymentFactory.createInvalidPayment();
 
         when(paymentService.saveAndPublishPayment(any(Payment.class), any(UUID.class))).thenThrow(new CustomInvalidField("Some validation error"));
@@ -113,7 +113,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatThrows400IfInvalidUUIDAndDoesNotReturnAnything() throws Exception {
+    void testThatPostReturnsClientErrorIfInvalidUUIDAndDoesNotReturnAnything() throws Exception {
         Payment invalidPayment = paymentFactory.createInvalidPayment();
 
         when(paymentService.saveAndPublishPayment(any(Payment.class), any(UUID.class))).thenThrow(new CustomInvalidUUIDVersion("Invalid UUID"));
@@ -126,7 +126,7 @@ class PaymentsControllerTest {
     }
 
     @Test
-    void testThatPostReturns202AndReturnsAPaymentIfItDoesNotExists() throws Exception {
+    void testThatPostReturnsAcceptedAndReturnsAPaymentIfItDoesNotExists() throws Exception {
         Payment validPayment = paymentFactory.createValidPayment();
         UUID validIdempotentKey = paymentFactory.getValidIdempotentKey();
         when(paymentService.saveAndPublishPayment(any(Payment.class), any(UUID.class))).thenReturn(Optional.of(validPayment));
